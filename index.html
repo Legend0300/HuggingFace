@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI Personality Predictor</title>
+    <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        .mbti-colors {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+        }
+    </style>
+</head>
+<body class="mbti-colors">
+    <div class="flex flex-col items-center justify-center h-screen">
+        <h1 class="text-xl font-bold mb-4">Discover Your MBTI Type</h1>
+        <div class="w-full max-w-md p-5 bg-white rounded-lg shadow-lg">
+            <form id="predictForm" class="flex flex-col space-y-4">
+                <input type="text" id="sentence" placeholder="Enter a sentence to analyze your MBTI type" class="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-600 text-gray-700">
+                <button type="button" onclick="submitSentence()" class="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Predict MBTI</button>
+            </form>
+            <p id="result" class="mt-4 text-center text-gray-700 bg-purple-600 text-white"></p>
+        </div>
+    </div>
+
+    <script>
+        async function submitSentence() {
+            const sentenceInput = document.getElementById('sentence');
+            const sentence = sentenceInput.value.trim();
+            if (sentence.length === 0) {
+                alert("Please enter a sentence.");
+                return;
+            }
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({sentence: sentence})
+            });
+            const data = await response.json();
+            document.getElementById('result').innerText = "Your MBTI Type: " + data.type.toUpperCase();
+            sentenceInput.value = ''; // Clear the input field
+
+            setTimeout(function() {
+                const mbtiUrl = `/redirect/${data.type}`;
+                window.location.href = mbtiUrl; // Redirect after showing result
+            }, 2000); // Redirect after 2 seconds
+        }
+    </script>
+</body>
+</html>
